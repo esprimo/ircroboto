@@ -21,7 +21,7 @@ string.underline() {
 	local underline=`tput smul`
 	local endUnderline=`tput rmul`
 	STRING_RESULT="${underline}${string}${endUnderline}"
-	echo "$STRING_RESULT"
+	printf '%s' "$STRING_RESULT"
 }
 
 string.bold() {
@@ -33,7 +33,7 @@ string.bold() {
 	local bold=`tput bold`
 	local unbold=`tput sgr0`
 	STRING_RESULT="${bold}${string}${unbold}"
-	echo "$STRING_RESULT"
+	printf '%s' "$STRING_RESULT"
 }
 string.red() {
 	# @desc Makes the text red and echoes it
@@ -42,7 +42,7 @@ string.red() {
 
 	local string="$1"
 	
-	echo -en '\E[0;31m'"$string"; tput sgr0; 
+	printf '%s' '\E[0;31m'"$string"; tput sgr0; 
 }
 string.green() {
 	# @desc Makes the text green and echoes it
@@ -51,7 +51,7 @@ string.green() {
 
 	local string="$1"
 	
-	echo -en '\E[0;32m'"$string"; tput sgr0; 
+	printf '%s' '\E[0;32m'"$string"; tput sgr0; 
 }
 string.cyan() { 
 	# @desc Makes the text cyan and echoes it
@@ -60,5 +60,5 @@ string.cyan() {
 
 	local string="$1"
 	
-	echo -en '\E[0;36m'"$string"; tput sgr0; 
+	printf '%s' '\E[0;36m'"$string"; tput sgr0; 
 }
