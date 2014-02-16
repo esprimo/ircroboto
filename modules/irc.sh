@@ -1,0 +1,226 @@
+# initiate needed gloval variables
+IRC_OP=false
+IRC_LAST_MSG_SENT_TIME=0
+IRC_RESULT=''
+IRC_FLOOD_DELAY=5
+IRC_SENT_QUEUE=0
+
+# You need to declare privMsg in your main script. (declare -A privMsg)
+
+irc.antiFlood() {
+    # @desc This is an anit-flood system so we won't get disconnected from the server.
+    # @desc Should only be used by funciton sendToServer.
+   
+    # get the diff between time now and the last message sent
+    local diff
+    diff=$(($(date +'%s') - $IRC_LAST_MSG_SENT_TIME))
+    if [[ $diff -gt 2 ]]; then
+        IRC_SENT_QUEUE=0
+    else
+        IRC_SENT_QUEUE=$(($IRC_SENT_QUEUE + 1))
+    fi
+    # If we've sent 5 messages too fast, sleep $IRC_FLOOD_DELAY sec and reset the counter
+    if [[ $IRC_SENT_QUEUE -gt 4 ]]; then
+        [[ $debug ]] && output.debugMsg "Almost flooded, sleeping $IRC_FLOOD_DELAY sec";
+        sleep $IRC_FLOOD_DELAY
+        IRC_SENT_QUEUE=0
+    fi
+    IRC_LAST_MSG_SENT_TIME=$(date +'%s')
+}
+
+irc.sendToServer() {
+    # @desc This should be used when communicating with the server. Will make
+    # @desc sure that we don't flood the server
+    # @param All arguments will be sent to the server, raw.
+
+    # Run the anti-flood check before sending anything to the server
+    irc.antiFlood
+    echo "$@" >&3
+}
+
+irc.sayToChannel() {
+    # @desc Wrapper to say things to the channel. You can either pipe messages to this 
+    # @desc function and it will say it to the channel or you can call it and it will 
+    # @desc say everything it gets as an argument
+    # @param $1 What to say to the channel. Optional.
+
+    if [[ $1 ]]; then
+        thingsToSay="$@"
+    else
+        read thingsToSay
+    fi
+    echo "Saying: $thingsToSay"
+    irc.sendToServer "PRIVMSG #$IRC_CHANNEL :$thingsToSay"
+}
+
+irc.handleMode() {
+    # TODO rewrite this. Old function
+    # This function will only check if the bot
+    # gets/loses op. This function is old and need some work tough
+
+    # check to see if it affects this bot
+    if [[ "$1" == *$nick* ]]; then
+        # trim down the message so we get something like this:
+        # +oov nick1 nick2 nick3
+        local mode=${1/#*#$IRC_CHANNEL /}
+        echo $mode
+        # the first byte is + or -
+        local modifier=${mode:0:1}
+
+        # find which index this bot is, so we can determine which mode we were set to
+        local index=0
+        for username in $mode; do
+            if [[ $username == $nick ]]; then
+                break
+            fi
+            index=$[index+1]
+        done
+
+        local statusIndex=$[index]
+        local status=${mode:$statusIndex:1}
+
+        # we just care about o (op) so check that first
+        if [[ $status == o ]]; then
+            if [[ $modifier == + ]]; then
+                hasOp=true
+            else
+                hasOp=false
+            fi
+        fi
+    fi
+}
+
+irc.parsePrivMsg() {
+    # @desc parse a PRIVMSG message and put all different pars in the global
+    # @desc array privMSG.
+    # @param $1 a raw PRIVMSG line from an IRC server
+    # @result privMsg['message'], privMsg['remoteNick'], privMsg['remoteName']
+    # @result privMsg['remoteName'], privMsg['remoteHost'] and privMsg['isPM'] will be set
+
+    local ircLine="$1"
+
+    # IRC messages is formated like this:
+    # :nickname!~username@the.users.host.com PRIVMSG #IRCchannel :message sent to channel goes here
+
+    # remove the first charater (:)
+    local tmp=${ircLine:1}
+
+    # remove everything 'til the new first : to get the acctual message
+    privMsg['message']=${tmp#*:}
+
+    # remove everithing after ! to get the nick
+    privMsg['remoteNick']=${tmp%\!*}
+
+    # take the data between ~ and @ to get the username
+    tmp=${tmp#*~}
+    privMsg['remoteName']=${tmp%@*}
+
+    # get everything between @ and the first space to get the host
+    tmp=${tmp#*@}
+    privMsg['remoteHost']=${tmp%% *}
+
+    # of what's left in data now (the.users.host.com PRIVMSG #IRCchannel :message sent to channel goes here)
+    # get everything between ' :' and the last space before that
+    tmp=${tmp% :*}
+    destination=${tmp##* }
+
+    # check if it's a private message or to a channel
+    local isPM
+    if [[ $destination == $nick ]]; then
+        privMsg['isPM']=true
+    else
+        privMsg['isPM']=false
+    fi
+
+}
+
+irc.handlePrivMsg() {
+    # @desc Handles a PRVMSG line coming from the IRC server. Will parse it and
+    # @desc send it to the module that will react on the messages (TODO say which module it is).
+    # @param $1 raw PRIVMSG line
+    
+    local ircLine="$1"
+    # parse the line we got from the IRC server and set everything in a global array
+    irc.parsePrivMsg "$ircLine"
+
+    # this is where the magic happens
+    . ./checkMessages.sh
+}
+
+irc.handlePing() {
+    # @desc Handles what happens when we get a PING request from the IRC server.
+    # @desc Will answer the server with a PONG.
+    # @param the raw PING line from the IRC server
+    local ircLine="$1"
+    # The pinging is not always the same as $IRC_SERVER (the one you connected to) if there is a round robin.
+    # A ping message can look a bit different, see https://tools.ietf.org/html/rfc2812#section-3.7.2
+    local pingServer
+    if [[ $ircLine == *:* ]]; then
+        pingServer=${1##*:}
+    else
+        pingServer=${1##* }
+    fi
+    
+    # send directly to the server without flood control, we don't want to get a ping timeout
+    echo "PONG $pingServer" >&3
+    
+    [[ $debug ]] && output.debugMsg "Received PING, sending PONG to: $pingServer"
+}
+
+irc.listenToFile() {
+    # @desc Start a fork that's tail -f:ing a file so that external scripts
+    # @desc can send IRC messages. A cronjob for example.
+
+    if [[ -f ./$fileToTail ]]; then
+        [[ $debug ]] && output.debugMsg 'Old tail-file found. Removing'
+        rm -f ./$fileToTail
+    fi
+    touch ./$fileToTail
+    (tail -f ircTail  | while read message; do irc.sayToChannel "$message"; done;) &
+}
+
+irc.getMsgType() {
+    # @desc Get what type of message was received (NOTICE, PRIVMSG, different numbers etc.)
+    # @param raw IRC line from IRC server
+    # @result Message type
+
+    local ircLine="$1"
+
+    firstChar=${line:0:1}
+    if [[ $firstChar == ':' ]]; then
+        data=${line:1}
+        data=${data#* }
+        msgType=${data%% *}
+    elif [[ ${line%% *} == 'PING' ]]; then
+        msgType='PING'
+    else
+        output.red 'Type not recognized: $line'
+        echo '$line' >> unrecognizedTypes
+        msgType=''
+    fi
+    IRC_RESULT="$msgType"
+}
+
+irc.identify() {
+    # @desc identify ourselfs to the IRC server
+    # @param $1 nickname. $2 real name. $3 channel to join (without #).
+
+    IRC_NICK="$1"
+    IRC_REAL_NAME="$2"
+    IRC_CHANNEL="$3"
+
+    irc.sendToServer "NICK $IRC_NICK"
+    irc.sendToServer "USER $IRC_NICK +i * :$IRC_REAL_NAME"
+    irc.sendToServer "JOIN #$IRC_CHANNEL"
+}
+
+irc.connectToServer() {
+    # @desc Connects to the IRC server on file descriptor 3
+    # @param $1 server to connect to. $2 port to connect to.
+
+    IRC_SERVER="$1"
+    IRC_PORT="$2"
+
+    # set up the connection and bind it to 
+    exec 3<>/dev/tcp/$IRC_SERVER/$IRC_PORT
+}
