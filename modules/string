@@ -35,15 +35,30 @@ string.bold() {
 	STRING_RESULT="${bold}${string}${unbold}"
 	echo "$STRING_RESULT"
 }
-string.red() { 
+string.red() {
+	# @desc Makes the text red and echoes it
+	# @param $1 is the string
+	# @result Will echo the final string
+
 	local string="$1"
+	
 	echo -en '\E[0;31m'"$string"; tput sgr0; 
 }
-string.green() { 
+string.green() {
+	# @desc Makes the text green and echoes it
+	# @param $1 is the string
+	# @result Will echo the final string
+
 	local string="$1"
+	
 	echo -en '\E[0;32m'"$string"; tput sgr0; 
 }
 string.cyan() { 
+	# @desc Makes the text cyan and echoes it
+	# @param $1 is the string
+	# @result Will echo the final string
+
 	local string="$1"
+	
 	echo -en '\E[0;36m'"$string"; tput sgr0; 
 }
