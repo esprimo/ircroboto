@@ -6,18 +6,17 @@ string.trim() {
     # @result the clean string
     # @cred I found this trim function on stackverflow by a guy called bashfu.
 
-    local var="$@"
-
+    local var=$@
     var="${var#"${var%%[![:space:]]*}"}"   # remove leading whitespace characters
     var="${var%"${var##*[![:space:]]}"}"   # remove trailing whitespace characters
     STRING_RESULT="$var"
-    printf '%s' "$STRING_RESULT"
 }
 
 string.underline() {
 	# @desc Underlines the input string and echoes it
 	# @param $1 is the string to underline.
 	# @result Will echo the final string and save it to result var
+	
 	local string="$1"
 
 	local underline=$(tput smul)
@@ -44,7 +43,7 @@ string.red() {
 
 	local string="$1"
 	
-	printf '%s' '\E[0;31m'"$string"; tput sgr0; 
+	echo -en '\E[0;31m'"$string"; tput sgr0; 
 }
 string.green() {
 	# @desc Makes the text green and echoes it
@@ -53,7 +52,7 @@ string.green() {
 
 	local string="$1"
 	
-	printf '%s' '\E[0;32m'"$string"; tput sgr0; 
+	echo -en '\E[0;32m'"$string"; tput sgr0; 
 }
 string.cyan() { 
 	# @desc Makes the text cyan and echoes it
@@ -62,5 +61,5 @@ string.cyan() {
 
 	local string="$1"
 	
-	printf '%s' '\E[0;36m'"$string"; tput sgr0; 
+	echo -en '\E[0;36m'"$string"; tput sgr0; 
 }
