@@ -1,7 +1,7 @@
 # @desc An example of how you can use this bot
 # @dest to react on different commands or words
 
-# case insensitev 
+# case insensitive 
 shopt -s nocasematch
 case "${privMsg['message']}" in
     \!hello) irc.sayToChannel "Well, hello there ${privMsg['remoteNick']}";;

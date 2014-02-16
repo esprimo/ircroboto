@@ -21,7 +21,7 @@ irc.antiFlood() {
     fi
     # If we've sent 5 messages too fast, sleep $IRC_FLOOD_DELAY sec and reset the counter
     if (( IRC_SENT_QUEUE > 4 )); then
-        [[ $debug ]] && output.debugMsg "Almost flooded, sleeping $IRC_FLOOD_DELAY sec";
+        [[ $debug ]] && printf '%s\n' "$(string.cyan 'DEBUG:') Almost flooded, sleeping $IRC_FLOOD_DELAY sec";
         sleep $IRC_FLOOD_DELAY
         IRC_SENT_QUEUE=0
     fi
@@ -35,7 +35,7 @@ irc.sendToServer() {
 
     # Run the anti-flood check before sending anything to the server
     irc.antiFlood
-    printf '%s\n' "$@"
+    printf '%s\n' "$(string.cyan '<') $@"
     printf '%s\n' "$@" >&3
 }
 
@@ -64,7 +64,7 @@ irc.handleMode() {
         # trim down the message so we get something like this:
         # +oov nick1 nick2 nick3
         local mode=${1/#*#$IRC_CHANNEL /}
-        printf '%s\n' "$mode"
+
         # the first byte is + or -
         local modifier=${mode:0:1}
 
@@ -110,7 +110,7 @@ irc.parsePrivMsg() {
     privMsg['message']=${tmp#*:}
 
     # remove everithing after ! to get the nick
-    privMsg['remoteNick']=${tmp%\!*}
+    privMsg['remoteNick']=${tmp%%\!*}
 
     # take the data between ~ and @ to get the username
     tmp=${tmp#*~}
@@ -127,7 +127,7 @@ irc.parsePrivMsg() {
 
     # check if it's a private message or to a channel
     local isPM
-    if [[ $destination == "$nick" ]]; then
+    if [[ "$destination" == "$nick" ]]; then
         privMsg['isPM']=true
     else
         privMsg['isPM']=false
@@ -145,7 +145,7 @@ irc.handlePrivMsg() {
     irc.parsePrivMsg "$ircLine"
 
     # this is where the magic happens
-    . ./checkMessages
+    . "$modulePath/checkMessages"
 }
 
 irc.handlePing() {
@@ -167,7 +167,7 @@ irc.handlePing() {
     # send directly to the server without flood control, we don't want to get a ping timeout
     printf '%s\n' "PONG $pingServer" >&3
     
-    [[ $debug ]] && output.debugMsg "Received PING, sending PONG to: $pingServer"
+    [[ $debug ]] && printf '%s\n' "$(string.cyan 'DEBUG:') Received PING, sending PONG to: $pingServer"
 }
 
 irc.listenToFile() {
@@ -175,7 +175,7 @@ irc.listenToFile() {
     # @desc can send IRC messages. A cronjob for example.
 
     if [[ -f ./$fileToTail ]]; then
-        [[ $debug ]] && output.debugMsg 'Old tail-file found. Removing'
+        [[ $debug ]] && printf '%s\n' "$(string.cyan 'DEBUG:') Old tail-file found. Removing"
         rm -f ./"$fileToTail"
     fi
     touch ./"$fileToTail"
@@ -197,7 +197,7 @@ irc.getMsgType() {
     elif [[ ${line%% *} == 'PING' ]]; then
         msgType='PING'
     else
-        output.red "Type not recognized: $line"
+        [[ $debug ]] && printf '%s\n' "$(string.cyan 'DEBUG:') Type not recognized: $line"
         printf '%s\n' "$line" >> unrecognizedTypes
         msgType=''
     fi

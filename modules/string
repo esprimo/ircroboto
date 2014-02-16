@@ -5,7 +5,7 @@ string.trim() {
     # @param $1 the string to clean up
     # @result the clean string
     # @cred I found this trim function on stackverflow by a guy called bashfu.
-    
+
     local var=$@
     var="${var#"${var%%[![:space:]]*}"}"   # remove leading whitespace characters
     var="${var%"${var##*[![:space:]]}"}"   # remove trailing whitespace characters
@@ -34,4 +34,16 @@ string.bold() {
 	local unbold=`tput sgr0`
 	STRING_RESULT="${bold}${string}${unbold}"
 	echo "$STRING_RESULT"
+}
+string.red() { 
+	local string="$1"
+	echo -en '\E[0;31m'"$string"; tput sgr0; 
+}
+string.green() { 
+	local string="$1"
+	echo -en '\E[0;32m'"$string"; tput sgr0; 
+}
+string.cyan() { 
+	local string="$1"
+	echo -en '\E[0;36m'"$string"; tput sgr0; 
 }
