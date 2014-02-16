@@ -6,7 +6,8 @@ string.trim() {
     # @result the clean string
     # @cred I found this trim function on stackverflow by a guy called bashfu.
 
-    local var=$@
+    local var="$@"
+
     var="${var#"${var%%[![:space:]]*}"}"   # remove leading whitespace characters
     var="${var%"${var##*[![:space:]]}"}"   # remove trailing whitespace characters
     STRING_RESULT="$var"
@@ -19,8 +20,8 @@ string.underline() {
 	# @result Will echo the final string and save it to result var
 	local string="$1"
 
-	local underline=`tput smul`
-	local endUnderline=`tput rmul`
+	local underline=$(tput smul)
+	local endUnderline=$(tput rmul)
 	STRING_RESULT="${underline}${string}${endUnderline}"
 	printf '%s' "$STRING_RESULT"
 }
@@ -31,8 +32,8 @@ string.bold() {
 	# @result Will echo the final string and save it to result var
 	local string="$1"
 
-	local bold=`tput bold`
-	local unbold=`tput sgr0`
+	local bold=$(tput bold)
+	local unbold=$(tput sgr0)
 	STRING_RESULT="${bold}${string}${unbold}"
 	printf '%s' "$STRING_RESULT"
 }
