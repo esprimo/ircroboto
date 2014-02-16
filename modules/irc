@@ -8,8 +8,8 @@ IRC_SENT_QUEUE=0
 # You need to declare privMsg in your main script. (declare -A privMsg)
 
 irc.antiFlood() {
-    # @desc This is an anit-flood system so we won't get disconnected from the server.
-    # @desc Should only be used by funciton sendToServer.
+    # @desc This is an anit-flood system so we won't get disconnected from the 
+    # @desc server. Should only be used by funciton sendToServer.
    
     # get the diff between time now and the last message sent
     local diff
@@ -19,9 +19,10 @@ irc.antiFlood() {
     else
         IRC_SENT_QUEUE=$((IRC_SENT_QUEUE + 1))
     fi
-    # If we've sent 5 messages too fast, sleep $IRC_FLOOD_DELAY sec and reset the counter
+    # If we've sent 5 messages too fast, sleep $IRC_FLOOD_DELAY sec and reset 
+    # the counter
     if (( IRC_SENT_QUEUE > 4 )); then
-        [[ $debug ]] && printf '%s\n' "$(string.cyan 'DEBUG:') Almost flooded, sleeping $IRC_FLOOD_DELAY sec";
+        debugMsg "Almost flooded, sleeping $IRC_FLOOD_DELAY sec";
         sleep $IRC_FLOOD_DELAY
         IRC_SENT_QUEUE=0
     fi
@@ -40,9 +41,9 @@ irc.sendToServer() {
 }
 
 irc.sayToChannel() {
-    # @desc Wrapper to say things to the channel. You can either pipe messages to this 
-    # @desc function and it will say it to the channel or you can call it and it will 
-    # @desc say everything it gets as an argument
+    # @desc Wrapper to say things to the channel. You can either pipe messages 
+    # @desc to this function and it will say it to the channel or you can call 
+    # @desc it and it will say everything it gets as an argument.
     # @param $1 What to say to the channel. Optional.
 
     if [[ $1 ]]; then
@@ -50,7 +51,7 @@ irc.sayToChannel() {
     else
         read thingsToSay
     fi
-    [[ $debug ]] && printf '%s\n' "Saying: $thingsToSay"
+    debugMsg "Saying: $thingsToSay"
     irc.sendToServer "PRIVMSG #$IRC_CHANNEL :$thingsToSay"
 }
 
@@ -68,7 +69,8 @@ irc.handleMode() {
         # the first byte is + or -
         local modifier=${mode:0:1}
 
-        # find which index this bot is, so we can determine which mode we were set to
+        # find which index this bot is, so we can determine which mode we were 
+        # set to
         local index=0
         for username in $mode; do
             if [[ $username == "$nick" ]]; then
@@ -96,12 +98,12 @@ irc.parsePrivMsg() {
     # @desc array privMSG.
     # @param $1 a raw PRIVMSG line from an IRC server
     # @result privMsg['message'], privMsg['remoteNick'], privMsg['remoteName']
-    # @result privMsg['remoteName'], privMsg['remoteHost'] and privMsg['isPM'] will be set
+    # @result privMsg['remoteName'], privMsg['remoteHost'] and privMsg['isPM']
 
     local ircLine="$1"
 
     # IRC messages is formated like this:
-    # :nickname!~username@the.users.host.com PRIVMSG #IRCchannel :message sent to channel goes here
+    # :nickname!~username@the.users.host.com PRIVMSG #IRCchannel :message sent
 
     # remove the first charater (:)
     local tmp=${ircLine:1}
@@ -120,7 +122,8 @@ irc.parsePrivMsg() {
     tmp=${tmp#*@}
     privMsg['remoteHost']=${tmp%% *}
 
-    # of what's left in data now (the.users.host.com PRIVMSG #IRCchannel :message sent to channel goes here)
+    # of what's left in data now (the.users.host.com PRIVMSG #IRCchannel 
+    # :message sent to channel goes here)
     # get everything between ' :' and the last space before that
     tmp=${tmp% :*}
     destination=${tmp##* }
@@ -137,11 +140,12 @@ irc.parsePrivMsg() {
 
 irc.handlePrivMsg() {
     # @desc Handles a PRVMSG line coming from the IRC server. Will parse it and
-    # @desc send it to the module that will react on the messages (TODO say which module it is).
+    # @desc send it to the module that will react on the messages.
     # @param $1 raw PRIVMSG line
     
     local ircLine="$1"
-    # parse the line we got from the IRC server and set everything in a global array
+    # parse the line we got from the IRC server and set everything in a global 
+    # array
     irc.parsePrivMsg "$ircLine"
 
     # this is where the magic happens
@@ -155,8 +159,9 @@ irc.handlePing() {
 
     local ircLine="$1"
 
-    # The pinging is not always the same as $IRC_SERVER (the one you connected to) if there is a round robin.
-    # A ping message can look a bit different, see https://tools.ietf.org/html/rfc2812#section-3.7.2
+    # The pinging is not always the same as $IRC_SERVER (the one you connected 
+    # to) if there is a round robin. A ping message can look a bit different, 
+    # see https://tools.ietf.org/html/rfc2812#section-3.7.2
     local pingServer
     if [[ $ircLine == *:* ]]; then
         pingServer=${1##*:}
@@ -164,10 +169,11 @@ irc.handlePing() {
         pingServer=${1##* }
     fi
     
-    # send directly to the server without flood control, we don't want to get a ping timeout
+    # send directly to the server without flood control, we don't want to get a 
+    # ping timeout
     printf '%s\n' "PONG $pingServer" >&3
     
-    [[ $debug ]] && printf '%s\n' "$(string.cyan 'DEBUG:') Received PING, sending PONG to: $pingServer"
+    debugMsg "Received PING, sending PONG to: $pingServer"
 }
 
 irc.listenToFile() {
@@ -175,15 +181,16 @@ irc.listenToFile() {
     # @desc can send IRC messages. A cronjob for example.
 
     if [[ -f ./$fileToTail ]]; then
-        [[ $debug ]] && printf '%s\n' "$(string.cyan 'DEBUG:') Old tail-file found. Removing"
+        debugMsg 'Old tail-file found. Removing'
         rm -f ./"$fileToTail"
     fi
     touch ./"$fileToTail"
-    (tail -f ircTail  | while read message; do irc.sayToChannel "$message"; done;) &
+    (tail -f ircTail  | while read -r msg; do irc.sayToChannel "$msg"; done;) &
 }
 
 irc.getMsgType() {
-    # @desc Get what type of message was received (NOTICE, PRIVMSG, different numbers etc.)
+    # @desc Get what type of message was received (NOTICE, PRIVMSG, different 
+    # @desc numbers etc.)
     # @param raw IRC line from IRC server
     # @result Message type
 
@@ -197,7 +204,7 @@ irc.getMsgType() {
     elif [[ ${line%% *} == 'PING' ]]; then
         msgType='PING'
     else
-        [[ $debug ]] && printf '%s\n' "$(string.cyan 'DEBUG:') Type not recognized: $line"
+        debugMsg "Type not recognized: $line"
         printf '%s\n' "$line" >> unrecognizedTypes
         msgType=''
     fi

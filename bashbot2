@@ -65,10 +65,12 @@ EOF
     exit 0
 }>&2
 
-TEMP=$(getopt -o s:p:n:r:c:t::hd --long server:,port:,nick:,real-name:,channel:,tail-file::,help,debug \
-     -n 'bashbot2.sh' -- "$@")
+TEMP=$(getopt -o s:p:n:r:c:t::hd --long server:,port:,nick:,real-name:,\
+channel:,tail-file::,help,debug -n 'bashbot2.sh' -- "$@")
 
-if [ $? != 0 ] ; then printf '%s\n' "Terminating..." >&2 ; exit 1 ; fi
+if [[ $? != 0 ]]; then 
+    printf '%s\n' "Terminating..." >&2 ; exit 1 ; 
+fi
 eval set -- "$TEMP"
 
 while true ; do
@@ -86,16 +88,29 @@ while true ; do
     esac
 done
 
+debugMsg() {
+    # @desc Print a noticable debug message to stdout
+    # @param Takes all parameters and as message
+
+    # if debug is not set, just abort this function
+    [[ ! $debug ]] && return
+
+    local debugMessage="$@"
+
+    printf '%s\n' "$(string.cyan 'DEBUG:') $debugMessage"
+}
+
 onExit() {
-    # @desc Will send QUIT to IRC server, remove temporary tail file if there is any,
-    # @desc kill forks and close the socket.
+    # @desc Will send QUIT to IRC server, remove temporary tail file if there is
+    # @desc any, kill forks and close the socket.
 
     kill 0
     irc.sendToServer 'QUIT :Shutting down'
     [[ $shouldTailFile ]] && rm -f ./$fileToTail
     exec 3<&-
     exec 3>&-
-    [[ $debug ]] && printf '%s\n' "$(string.cyan 'DEBUG:') Exit caught. Cleaning up and closing connection."
+
+    debugMsg "Exit caught. Cleaning up and closing connection."
 }
 
 # run onExit when exiting/stopping the script
