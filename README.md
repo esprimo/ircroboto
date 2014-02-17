@@ -1,5 +1,5 @@
 ##IrcRoboto
-For some eason I made an IRC bot in bash.
+For some reason I made an IRC bot in bash.
 
 ###Usage
     $ ./bashbot2 --help
