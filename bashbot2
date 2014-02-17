@@ -125,9 +125,6 @@ irc.identify "$nick" "$name" "$channel"
 # read every response from the server and handle it line by line
 while read -r line; do
     # Line needs to be trimmed of spaces or it will be impossible to parse. 
-    # This was a pain in the ass to find out. Try:
-    # exec 3<>/dev/tcp/google.com/80; printf '%s\n' "GET /" >&3; while read line <&3; do printf '%s\n' "BEFORE $line AFTER"; done
-    # to get a grip of wtf is happening otherwise.
     string.trim "$line"
     line="$STRING_RESULT"
 
