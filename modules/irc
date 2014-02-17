@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 # initiate needed gloval variables
 IRC_OP=false
 IRC_LAST_MSG_SENT_TIME=0
@@ -169,9 +171,7 @@ irc.handlePing() {
         pingServer=${1##* }
     fi
     
-    # send directly to the server without flood control, we don't want to get a 
-    # ping timeout
-    printf '%s\n' "PONG $pingServer" >&3
+    irc.sendToServer "PONG $pingServer"
     
     debugMsg "Received PING, sending PONG to: $pingServer"
 }
