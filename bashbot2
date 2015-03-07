@@ -6,7 +6,7 @@ name=kebab
 channel=ircRobotoTestChannel
 server=irc.freenode.net
 port=6667
-fileToTail=ircTail
+fileToTail=''
 
 readonly modulePath='modules'
 
@@ -52,8 +52,8 @@ Usage:
         -r, --real-name $(string.underline REALNAME)
                     Real name this bot sould use
         
-        -t, --tail-file
-                    Tail a file and output the conetent to the channel
+        -t, --tail-file $(string.underline FILE)
+                    Tail $(string.underline FILE) and output the conetent to the channel
         
         -d, --debug
                     Print debugging messages
@@ -65,8 +65,8 @@ EOF
     exit 0
 }>&2
 
-TEMP=$(getopt -o s:p:n:r:c:t::hd --long server:,port:,nick:,real-name:,\
-channel:,tail-file::,help,debug -n 'bashbot2.sh' -- "$@")
+TEMP=$(getopt -o s:p:n:r:c:t:hd --long server:,port:,nick:,real-name:,\
+channel:,tail-file:,help,debug -n 'bashbot2.sh' -- "$@")
 
 if [[ $? != 0 ]]; then 
     printf '%s\n' "Terminating..." >&2 ; exit 1 ; 
@@ -80,7 +80,7 @@ while true ; do
         -n|--nick) nick=$2; shift 2;;
         -r|--real-name) name=$2; shift 2;;
         -c|--channel) channel=$2; shift 2;;
-        -t|--tail-file) shouldTailFile=1; shift 2;;
+        -t|--tail-file) fileToTail=$2; shouldTailFile=1; shift 2;;
         -d|--debug) debug=1; shift;;
         -h|--help) usage; shift;;
         --) shift; break;;

@@ -185,7 +185,7 @@ irc.listenToFile() {
         rm -f ./"$fileToTail"
     fi
     touch ./"$fileToTail"
-    (tail -f ircTail  | while read -r msg; do irc.sayToChannel "$msg"; done;) &
+    (tail -f $fileToTail  | while read -r msg; do irc.sayToChannel "$msg"; done;) &
 }
 
 irc.getMsgType() {

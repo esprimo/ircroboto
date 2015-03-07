@@ -22,8 +22,8 @@ For some reason I made an IRC bot in bash.
             -r, --real-name REALNAME
                         Real name this bot sould use
             
-            -t, --tail-file
-                        Tail a file and output the conetent to the channel
+            -t, --tail-file FILE
+                        Tail FILE and output the conetent to the channel
             
             -d, --debug
                         Print debugging messages
