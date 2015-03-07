@@ -15,7 +15,7 @@ irc.antiFlood() {
    
     # get the diff between time now and the last message sent
     local diff
-    diff=$(($(date +'%s') - IRC_LAST_MSG_SENT_TIME))
+    diff=$((SECONDS - IRC_LAST_MSG_SENT_TIME))
     if (( diff > 2 )); then
         IRC_SENT_QUEUE=0
     else
@@ -28,7 +28,7 @@ irc.antiFlood() {
         sleep $IRC_FLOOD_DELAY
         IRC_SENT_QUEUE=0
     fi
-    IRC_LAST_MSG_SENT_TIME=$(date +'%s')
+    IRC_LAST_MSG_SENT_TIME=$SECONDS
 }
 
 irc.sendToServer() {
