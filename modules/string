@@ -74,7 +74,7 @@ string.red() {
 
 	local string="$1"
 	
-	echo -en '\E[0;31m'"$string"; tput sgr0; 
+	echo -en "${Red}${string}${Color_Off}"
 }
 string.green() {
 	# @desc Makes the text green and echoes it
@@ -83,7 +83,7 @@ string.green() {
 
 	local string="$1"
 	
-	echo -en '\E[0;32m'"$string"; tput sgr0; 
+	echo -en "${Green}${string}${Color_Off}"
 }
 string.cyan() { 
 	# @desc Makes the text cyan and echoes it
@@ -92,5 +92,5 @@ string.cyan() {
 
 	local string="$1"
 	
-	echo -en '\E[0;36m'"$string"; tput sgr0; 
+	echo -en "${Cyan}${string}${Color_Off}"
 }
