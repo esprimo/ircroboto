@@ -10,3 +10,5 @@ shopt -s nocasematch
 case "${privMsg['message']}" in
     \!hello) sayHelloBack;;
 esac
+
+# vi:syntax=bash

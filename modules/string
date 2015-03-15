@@ -94,3 +94,4 @@ string.cyan() {
 	
 	echo -en "${Cyan}${string}${Color_Off}"
 }
+# vi:syntax=bash

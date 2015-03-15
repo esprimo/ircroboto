@@ -1,5 +1,3 @@
-#!/usr/bin/env bash
-
 # initiate needed gloval variables
 IRC_OP=false
 IRC_LAST_MSG_SENT_TIME=0
@@ -234,3 +232,5 @@ irc.connectToServer() {
     # set up the connection and bind it 
     exec 3<>/dev/tcp/"$IRC_SERVER"/"$IRC_PORT"
 }
+
+# vi:syntax=bash
