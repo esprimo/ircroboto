@@ -125,8 +125,7 @@ irc.identify "$nick" "$name" "$channel"
 # read every response from the server and handle it line by line
 while read -r line; do
     # Line needs to be trimmed of spaces or it will be impossible to parse. 
-    string.trim "$line"
-    line="$STRING_RESULT"
+	line=$(string.trim "$line")
 
     irc.getMsgType "$line"
     msgType="$IRC_RESULT"
