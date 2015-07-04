@@ -17,8 +17,6 @@ bold='\e[1m'
 # Underline
 underline='\e[4m'
 
-# Taken from https://wiki.archlinux.org/index.php/Color_Bash_Prompt
-
 string.trim() {
     # @desc remove leading and trailing whitespaces from a string
     # @param $1 the string to clean up
