@@ -1,5 +1,5 @@
 # Reset
-Color_Off='\e[0m'       # Text Reset
+Reset_style='\e[0m'       # Text Reset
 
 # Regular Colors
 Black='\e[0;30m'        # Black
@@ -45,7 +45,7 @@ string.underline() {
 	
 	local string="$1"
 
-	echo -en "${underline}${string}${Color_Off}"
+	echo -en "${underline}${string}${Reset_style}"
 }
 
 string.bold() {
@@ -65,7 +65,7 @@ string.red() {
 
 	local string="$1"
 	
-	echo -en "${Red}${string}${Color_Off}"
+	echo -en "${Red}${string}${Reset_style}"
 }
 string.green() {
 	# @desc Makes the text green and echoes it
@@ -74,7 +74,7 @@ string.green() {
 
 	local string="$1"
 	
-	echo -en "${Green}${string}${Color_Off}"
+	echo -en "${Green}${string}${Reset_style}"
 }
 string.cyan() { 
 	# @desc Makes the text cyan and echoes it
@@ -83,6 +83,6 @@ string.cyan() {
 
 	local string="$1"
 	
-	echo -en "${Cyan}${string}${Color_Off}"
+	echo -en "${Cyan}${string}${Reset_style}"
 }
 # vi:syntax=bash
