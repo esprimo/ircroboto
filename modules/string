@@ -22,14 +22,7 @@ BCyan='\e[1;36m'        # Cyan
 BWhite='\e[1;37m'       # White
 
 # Underline
-UBlack='\e[4;30m'       # Black
-URed='\e[4;31m'         # Red
-UGreen='\e[4;32m'       # Green
-UYellow='\e[4;33m'      # Yellow
-UBlue='\e[4;34m'        # Blue
-UPurple='\e[4;35m'      # Purple
-UCyan='\e[4;36m'        # Cyan
-UWhite='\e[4;37m'       # White
+underline='\e[4m'
 
 # Taken from https://wiki.archlinux.org/index.php/Color_Bash_Prompt
 
@@ -52,9 +45,7 @@ string.underline() {
 	
 	local string="$1"
 
-	local underline=$(tput smul)
-	local endUnderline=$(tput rmul)
-	printf '%s' "${underline}${string}${endUnderline}"
+	echo -en "${underline}${string}${Color_Off}"
 }
 
 string.bold() {
