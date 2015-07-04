@@ -1,15 +1,15 @@
 # Reset
 Reset_style='\e[0m'       # Text Reset
 
-# Regular Colors
-Black='\e[30m'        # Black
-Red='\e[31m'          # Red
-Green='\e[32m'        # Green
-Yellow='\e[33m'       # Yellow
-Blue='\e[34m'         # Blue
-Purple='\e[35m'       # Purple
-Cyan='\e[36m'         # Cyan
-White='\e[37m'        # White
+# Colors
+Black='\e[30m'
+Red='\e[31m'
+Green='\e[32m'
+Yellow='\e[33m'
+Blue='\e[34m'
+Purple='\e[35m'
+Cyan='\e[36m'
+White='\e[37m'
 
 # Bold
 bold='\e[1m'
