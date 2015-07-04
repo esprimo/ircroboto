@@ -32,7 +32,7 @@ import 'string'
 import 'irc'
 
 function usage() {
-    cat << EOF
+	read -r -d '' usageText << EOF
 Usage:
     $(basename "$0") [OPTIONS...]
 
@@ -60,8 +60,8 @@ Usage:
         
         -h, --help
                     Print this message
-
 EOF
+	printf '%s\n\n' "$usageText"
     exit 0
 }>&2
 
