@@ -1,7 +1,6 @@
 # initiate needed gloval variables
 IRC_OP=false
 IRC_LAST_MSG_SENT_TIME=0
-IRC_RESULT=''
 IRC_FLOOD_DELAY=5
 IRC_SENT_QUEUE=0
 
@@ -206,7 +205,7 @@ irc.getMsgType() {
         printf '%s\n' "$line" >> unrecognizedTypes
         msgType=''
     fi
-    IRC_RESULT="$msgType"
+    printf '%s' "$msgType"
 }
 
 irc.identify() {
