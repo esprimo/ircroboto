@@ -9,7 +9,7 @@ IRC_SENT_QUEUE=0
 irc.antiFlood() {
     # @desc This is an anit-flood system so we won't get disconnected from the 
     # @desc server. Should only be used by funciton sendToServer.
-   
+
     # get the diff between time now and the last message sent
     local diff
     diff=$((SECONDS - IRC_LAST_MSG_SENT_TIME))
@@ -141,7 +141,7 @@ irc.handlePrivMsg() {
     # @desc Handles a PRVMSG line coming from the IRC server. Will parse it and
     # @desc send it to the module that will react on the messages.
     # @param $1 raw PRIVMSG line
-    
+
     local ircLine="$1"
     # parse the line we got from the IRC server and set everything in a global 
     # array
@@ -167,9 +167,9 @@ irc.handlePing() {
     else
         pingServer=${1##* }
     fi
-    
+
     irc.sendToServer "PONG $pingServer"
-    
+
     debugMsg "Received PING, sending PONG to: $pingServer"
 }
 
@@ -205,6 +205,7 @@ irc.getMsgType() {
         printf '%s\n' "$line" >> unrecognizedTypes
         msgType=''
     fi
+
     printf '%s' "$msgType"
 }
 
