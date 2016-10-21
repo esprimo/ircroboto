@@ -22,9 +22,10 @@ irc.antiFlood() {
     # the counter
     if (( IRC_SENT_QUEUE > 4 )); then
         debugMsg "Almost flooded, sleeping $IRC_FLOOD_DELAY sec";
-        sleep $IRC_FLOOD_DELAY
+        read -t $IRC_FLOOD_DELAY
         IRC_SENT_QUEUE=0
     fi
+
     IRC_LAST_MSG_SENT_TIME=$SECONDS
 }
 
