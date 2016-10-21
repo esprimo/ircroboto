@@ -10,7 +10,7 @@ fileToTail=''
 
 readonly modulePath='modules'
 
-# there seems to be a bug(?) in bash which makes it impossible to declare a 
+# there seems to be a bug(?) in bash which makes it impossible to declare a
 # global array in an included script. This is needed in the IRC module
 declare -A privMsg
 
@@ -24,7 +24,7 @@ import() {
         . "$modulePath/$module"
     else
         printf '%s\n' "Module $modulePath/$module does not exist" >&2
-        exit 1;  
+        exit 1;
     fi
 }
 
@@ -39,25 +39,25 @@ Usage:
     Options:
         -s, --server $(string.underline SERVER)
                     IP or domain name of the IRC server
-        
+
         -p, --port $(string.underline PORT)
                     Which port to connect to
-        
+
         -c, --channel $(string.underline CHANNEL)
                     Name of the channel this bot should join
-        
+
         -n, --nick $(string.underline NICK)
                     Nickname this bot sould use
-        
+
         -r, --real-name $(string.underline REALNAME)
                     Real name this bot sould use
-        
+
         -t, --tail-file $(string.underline FILE)
                     Tail $(string.underline FILE) and output the conetent to the channel
-        
+
         -d, --debug
                     Print debugging messages
-        
+
         -h, --help
                     Print this message
 EOF
@@ -68,8 +68,8 @@ EOF
 TEMP=$(getopt -o s:p:n:r:c:t:hd --long server:,port:,nick:,real-name:,\
 channel:,tail-file:,help,debug -n 'bashbot2.sh' -- "$@")
 
-if [[ $? != 0 ]]; then 
-    printf '%s\n' "Terminating..." >&2 ; exit 1 ; 
+if [[ $? != 0 ]]; then
+    printf '%s\n' "Terminating..." >&2 ; exit 1 ;
 fi
 eval set -- "$TEMP"
 
@@ -124,8 +124,8 @@ irc.identify "$nick" "$name" "$channel"
 
 # read every response from the server and handle it line by line
 while read -r line; do
-    # Line needs to be trimmed of spaces or it will be impossible to parse. 
-	line=$(string.trim "$line")
+    # Line needs to be trimmed of spaces or it will be impossible to parse.
+    line=$(string.trim "$line")
 
     irc.getMsgType "$line"
     msgType="$IRC_RESULT"
