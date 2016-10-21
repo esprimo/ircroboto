@@ -8,7 +8,7 @@ server=irc.freenode.net
 port=6667
 fileToTail=''
 
-readonly modulePath='modules'
+readonly modulePath="${0%/*}/modules"
 
 # there seems to be a bug(?) in bash which makes it impossible to declare a
 # global array in an included script. This is needed in the IRC module
