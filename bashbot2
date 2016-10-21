@@ -34,7 +34,7 @@ import 'irc'
 function usage() {
 	read -r -d '' usageText << EOF
 Usage:
-    $(basename "$0") [OPTIONS...]
+    ${0##*/} [OPTIONS...]
 
     Options:
         -s, --server $(string.underline SERVER)
