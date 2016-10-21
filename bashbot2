@@ -127,10 +127,9 @@ while read -r line; do
     # Line needs to be trimmed of spaces or it will be impossible to parse.
     line=$(string.trim "$line")
 
-    irc.getMsgType "$line"
-    msgType="$IRC_RESULT"
-
+    msgType=$(irc.getMsgType "$line")
     printf '%s\n' "$(string.green '>') $line"
+
     case "$msgType" in
         PING) irc.handlePing "$line";;
         PRIVMSG) irc.handlePrivMsg "$line";;
