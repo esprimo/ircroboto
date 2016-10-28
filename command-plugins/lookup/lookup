@@ -1,0 +1,25 @@
+lookup() {
+    # Takes a command with ?cmd and will then "look up what cmd means".
+    # There is a text database with lines of text, the first word is considered
+    # the "command" to print out what's after it.
+    # Eg. ?hello would look up the line that begins with "hello" and print
+    # that line to the channel, excluding the "hello".
+
+    local msg="${privMsg['message']}"
+    # We only listen to one word at a time
+    local word="${msg%% *}"
+    # First character is going to be a ?, remove it
+    word="${word:1}"
+
+    # Find the line that begins with the word/command
+    while read line; do
+        if [[ $line =~ ^"${word} " ]]; then
+            line=${line#* }
+            irc.sayToChannel "$line"
+            break
+        fi
+    done <command-plugins/lookup/wordbase
+}
+
+
+

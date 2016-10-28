@@ -1,0 +1,25 @@
+set() {
+    # This function will get messages starting with a ".", the word after
+    # the dot will be the trigger word/command. The whole line will be save in
+    # a flat file "database". Duplicate trigger words will be overwritten, last
+    # in will be the winner!
+
+    local msg="${privMsg['message']}"
+
+    # First character is going to be a ., remove it
+    msg="${msg:1}"
+
+    # Make sure to remove/overwrite if the trigger word is already used
+    word="${msg%% *}"
+
+    # Only allow a-zA-Z for trigger words (to not fuck up regex for sed)
+    if [[ $word =~ ^[a-zA-Z]+$ ]]; then
+
+        sed -i "/^${word} /d" command-plugins/lookup/wordbase
+
+        echo "$msg" >> command-plugins/lookup/wordbase
+    else
+        irc.sayToChannel "Must be a-zA-Z"
+    fi
+}
+
