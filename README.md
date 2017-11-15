@@ -1,8 +1,9 @@
-##IrcRoboto
+# IrcRoboto
 For some reason I made an IRC bot in bash.
 
-###Usage
-    $ ./bashbot2 --help
+## Usage
+```
+$ ./bashbot2 --help
     Usage:
         bashbot2 [OPTIONS...]
 
@@ -30,4 +31,4 @@ For some reason I made an IRC bot in bash.
             
             -h, --help
                         Print this message
-                        
+```
